@@ -11,7 +11,11 @@
       <div class="demand-trend-cards">
         <div class="trend-card increasing-card">
           <div class="trend-header">
-            <div class="trend-icon">↑</div>
+            <div class="trend-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/>
+              </svg>
+            </div>
             <div>
               <div class="trend-label">{{ t('demand.increasingDemand') }}</div>
               <div class="trend-count">{{ t('demand.itemsCount', { count: getForecastsByTrend('increasing').length }) }}</div>
@@ -20,7 +24,7 @@
           <div class="trend-items">
             <div v-for="item in getForecastsByTrend('increasing').slice(0, 5)" :key="item.id" class="trend-item">
               <span class="item-name">{{ item.item_name }}</span>
-              <span class="item-change">+{{ getChangePercent(item) }}%</span>
+              <span class="item-change">{{ getChangePercent(item) }}%</span>
             </div>
             <div v-if="getForecastsByTrend('increasing').length > 5" class="more-items">
               +{{ getForecastsByTrend('increasing').length - 5 }} {{ t('demand.more') }}
@@ -30,7 +34,11 @@
 
         <div class="trend-card stable-card">
           <div class="trend-header">
-            <div class="trend-icon">→</div>
+            <div class="trend-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14M13.5 5.25L20.25 12l-6.75 6.75"/>
+              </svg>
+            </div>
             <div>
               <div class="trend-label">{{ t('demand.stableDemand') }}</div>
               <div class="trend-count">{{ t('demand.itemsCount', { count: getForecastsByTrend('stable').length }) }}</div>
@@ -49,7 +57,11 @@
 
         <div class="trend-card decreasing-card">
           <div class="trend-header">
-            <div class="trend-icon">↓</div>
+            <div class="trend-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M2.25 6L9 12.75l4.306-4.307a11.95 11.95 0 015.814 5.519l2.74 1.22m0 0l-5.94 2.28m5.94-2.28l-2.28-5.941"/>
+              </svg>
+            </div>
             <div>
               <div class="trend-label">{{ t('demand.decreasingDemand') }}</div>
               <div class="trend-count">{{ t('demand.itemsCount', { count: getForecastsByTrend('decreasing').length }) }}</div>
@@ -179,14 +191,14 @@ export default {
       const change = forecast.forecasted_demand - forecast.current_demand
       const changePercent = Math.abs((change / forecast.current_demand) * 100)
 
-      // If change is within ±2%, consider it stable and show blue
+      // If change is within ±2%, consider it stable and show accent blue
       if (changePercent <= 2) {
-        return '#3b82f6' // Blue for stable
+        return '#2563eb' // --accent
       }
 
-      if (change > 0) return '#10b981' // Green for increasing
-      if (change < 0) return '#ef4444' // Red for decreasing
-      return '#3b82f6' // Blue for no change
+      if (change > 0) return '#059669' // --success
+      if (change < 0) return '#dc2626' // --danger
+      return '#2563eb' // --accent
     }
 
     const translatePeriod = (period) => {
@@ -224,146 +236,122 @@ export default {
 </script>
 
 <style scoped>
+/* ─── Trend summary cards grid ───────────────────────────────────────────── */
 .demand-trend-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
 }
 
 .trend-card {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 1.5rem;
-  transition: all 0.2s ease;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .trend-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
 }
 
-.increasing-card {
-  border-left: 4px solid #10b981;
-}
+.increasing-card { border-left: 3px solid var(--success); }
+.stable-card     { border-left: 3px solid var(--accent); }
+.decreasing-card { border-left: 3px solid var(--danger); }
 
-.stable-card {
-  border-left: 4px solid #3b82f6;
-}
-
-.decreasing-card {
-  border-left: 4px solid #ef4444;
-}
-
+/* ─── Card header ─────────────────────────────────────────────────────────── */
 .trend-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #f1f5f9;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--divider);
 }
 
 .trend-icon {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  font-size: 1.75rem;
-  font-weight: 700;
+  border-radius: var(--radius-md);
   flex-shrink: 0;
 }
 
-.increasing-card .trend-icon {
-  background: #d1fae5;
-  color: #059669;
-}
+.increasing-card .trend-icon { background: #d1fae5; color: var(--success); }
+.stable-card     .trend-icon { background: var(--accent-soft); color: var(--accent); }
+.decreasing-card .trend-icon { background: #fef2f2; color: var(--danger); }
 
-.stable-card .trend-icon {
-  background: #dbeafe;
-  color: #2563eb;
-}
-
-.decreasing-card .trend-icon {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
+/* ─── Label / count ───────────────────────────────────────────────────────── */
 .trend-label {
-  font-size: 0.875rem;
+  font-size: 0.6875rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .trend-count {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #0f172a;
-  margin-top: 0.25rem;
+  color: var(--text-strong);
+  letter-spacing: -0.02em;
+  margin-top: var(--space-1);
 }
 
+/* ─── Item rows ───────────────────────────────────────────────────────────── */
 .trend-items {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-2);
 }
 
 .trend-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0.75rem;
-  background: #f8fafc;
-  border-radius: 6px;
-  transition: background 0.2s;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  transition: background 0.12s ease;
 }
 
 .trend-item:hover {
-  background: #f1f5f9;
+  background: var(--divider);
 }
 
 .item-name {
   font-size: 0.875rem;
-  color: #0f172a;
+  color: var(--text-strong);
   font-weight: 500;
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-right: 1rem;
+  margin-right: var(--space-4);
 }
 
 .item-change {
-  font-size: 0.813rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   flex-shrink: 0;
 }
 
-.increasing-card .item-change {
-  color: #059669;
-}
+.increasing-card .item-change { color: var(--success); }
+.stable-card     .item-change { color: var(--accent); }
+.decreasing-card .item-change { color: var(--danger); }
+.item-change.neutral           { color: var(--text-muted); }
 
-.stable-card .item-change {
-  color: #3b82f6;
-}
-
-.decreasing-card .item-change {
-  color: #dc2626;
-}
-
-.item-change.neutral {
-  color: #64748b;
-}
-
+/* ─── Overflow label ──────────────────────────────────────────────────────── */
 .more-items {
-  font-size: 0.813rem;
-  color: #64748b;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
   font-style: italic;
   text-align: center;
-  padding: 0.5rem;
+  padding: var(--space-2) 0;
 }
 </style>
