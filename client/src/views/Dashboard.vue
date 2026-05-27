@@ -180,7 +180,6 @@
                   <th>{{ t('dashboard.inventoryShortages.shortage') }}</th>
                   <th>{{ t('dashboard.inventoryShortages.daysDelayed') }}</th>
                   <th>{{ t('dashboard.inventoryShortages.priority') }}</th>
-                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -207,22 +206,6 @@
                     <span :class="['badge', item.priority]">
                       {{ translatePriority(item.priority) }}
                     </span>
-                  </td>
-                  <td>
-                    <button
-                      v-if="!item.purchase_order_id"
-                      @click.stop="openPOModal(item)"
-                      class="po-button create"
-                    >
-                      Create PO
-                    </button>
-                    <button
-                      v-else
-                      @click.stop="viewPO(item)"
-                      class="po-button view"
-                    >
-                      View PO
-                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -285,14 +268,6 @@
       :backlog-item="selectedBacklogItem"
       @close="showBacklogModal = false"
     />
-
-    <PurchaseOrderModal
-      :is-open="showPOModal"
-      :backlog-item="selectedBacklogForPO"
-      :mode="poModalMode"
-      @close="showPOModal = false"
-      @po-created="handlePOCreated"
-    />
   </div>
 </template>
 
@@ -324,9 +299,6 @@ export default {
     const selectedProduct = ref(null)
     const showBacklogModal = ref(false)
     const selectedBacklogItem = ref(null)
-    const showPOModal = ref(false)
-    const selectedBacklogForPO = ref(null)
-    const poModalMode = ref('create')
 
     // Use shared filters
     const {
@@ -650,28 +622,6 @@ export default {
       showBacklogModal.value = true
     }
 
-    const openPOModal = (item) => {
-      selectedBacklogForPO.value = item
-      poModalMode.value = 'create'
-      showPOModal.value = true
-    }
-
-    const viewPO = (item) => {
-      selectedBacklogForPO.value = item
-      poModalMode.value = 'view'
-      showPOModal.value = true
-    }
-
-    const handlePOCreated = (poData) => {
-      // Update the backlog item with the new PO ID
-      const item = allBacklogItems.value.find(b => b.id === poData.backlog_item_id)
-      if (item) {
-        item.purchase_order_id = poData.id
-        item.purchase_order = poData
-      }
-      showPOModal.value = false
-    }
-
     // Watch for filter changes and reload data
     watch([selectedPeriod, selectedLocation, selectedCategory, selectedStatus], () => {
       loadData()
@@ -714,13 +664,7 @@ export default {
       formatCurrency,
       Math,
       translateProductName,
-      translateWarehouse,
-      showPOModal,
-      selectedBacklogForPO,
-      poModalMode,
-      openPOModal,
-      viewPO,
-      handlePOCreated
+      translateWarehouse
     }
   }
 }
@@ -1118,39 +1062,5 @@ export default {
 
 .clickable-row:hover {
   background: var(--accent-soft) !important;
-}
-
-/* ── Purchase-order buttons ── */
-.po-button {
-  padding: var(--space-2) var(--space-4);
-  border: none;
-  border-radius: var(--radius-sm);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: filter 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
-  white-space: nowrap;
-}
-
-.po-button.create {
-  background: var(--accent);
-  color: white;
-}
-
-.po-button.create:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
-}
-
-.po-button.view {
-  background: var(--text-muted);
-  color: white;
-}
-
-.po-button.view:hover {
-  filter: brightness(1.15);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
 }
 </style>
